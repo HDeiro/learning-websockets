@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script 
+        src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js">
+    </script>
+</head>
+<body>
+    <script type="application/javascript">
+        const socket = io('http://localhost:8000');
+
+        socket.on('connect', data => {
+            // Receiving
+            socket.on('WELCOME-EVENT-TYPE', message => console.log('Received Message\n\t', message));
+            // Emitting
+            socket.emit('WELCOME-EVENT-TYPE', {data: 'Test Message!!!'});
+        });
+    </script>
+</body>
+</html>
