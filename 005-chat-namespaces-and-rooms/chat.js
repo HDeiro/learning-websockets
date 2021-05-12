@@ -9,16 +9,18 @@ const io = socketio(expressServer);
 
 io.on('connection', socket => {
     console.log('Connected to BASE namespace');
-
     // Emit to the single connected client
     socket.emit('messageFromServer', {data: 'Welcome to the Socket.io Server'});
-
     socket.on('messageToServer', dataFromClient => console.log(dataFromClient));
-
-    socket.on('newMessageToServer', dataFromClient => {
-        // Emit to all connected clients
-        io.emit('messageToClients', dataFromClient);
-    });
+    // Joining rooms
+    socket.join('level1');
+    /**
+     * For this case considering it's inside of a connection event one of the two clients
+     * does not have enought time to connect and be ready to receive it. In this case
+     * the socket io reference (io) should be the one to emit the event.
+     */
+    // socket.to('level1').emit('joined', `${socket.id} says I have joined the level 1 room`);
+    io.to('level1').emit('joined', `${socket.id} says I have joined the level 1 room`);
 });
 
 io.of('/admin').on('connection', socket => {
