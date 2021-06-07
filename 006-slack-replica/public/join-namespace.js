@@ -38,10 +38,14 @@ function joinNamespace(endpoint) {
     currentNamespace = endpoint;
 
     // Create a new Socket
-    nsSocket = io(`${root}${endpoint}`);
+    nsSocket = io(`${root}${endpoint}`, {
+        query: {
+            username: "Hugo Deiró!"
+        }
+    });
     nsSocket.on('nsRoomList', updateRoomsGroup);
 
-    // Readd listener
+    // Read listener
     $('#user-input').addEventListener('submit', onMessageSubmit, true);
     
     console.log(`Joined the namespace ${endpoint}`);

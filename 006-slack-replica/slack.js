@@ -19,6 +19,9 @@ io.on('connection', socket => {
 // Loop through each namespace and listen for a connection
 namespaces.forEach(namespace => {
     io.of(namespace.endpoint).on('connection', nsSocket => {
+        // On the query you can find the values sent during the io connection on the client side
+        // console.log(nsSocket.handshake.query); 
+
         console.log(`${nsSocket.id} has joined the namespace ${namespace.endpoint}`);
 
         // Sending back the particular namespace information back to the socket

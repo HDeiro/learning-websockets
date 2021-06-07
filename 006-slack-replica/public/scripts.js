@@ -2,7 +2,11 @@ const $  = document.querySelector.bind(document);
 const $$ = document.querySelectorAll.bind(document);
 
 const root    = 'http://localhost:8000';
-const socket1 = io(`${root}`);
+const socket1 = io(`${root}`, {
+    query: {
+        username: "Hugo Deiró!"
+    }
+});
 
 socket1.on('connect', () => console.log(`Connected through ${socket1.id}`));
 

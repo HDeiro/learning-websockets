@@ -23,9 +23,9 @@ function onMessageSubmit(evt) {
     const input = $('#user-message');
 
     const message = {
+        username: 'hdeiro',
         text: input.value,
         time: new Date().toLocaleTimeString(),
-        username: 'hdeiro',
         avatar: 'https://via.placeholder.com/30'
     };
 
