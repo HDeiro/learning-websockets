@@ -26,12 +26,17 @@ namespaces.forEach(namespace => {
 
         // Listening from a joining room request from the client
         nsSocket.on('joinRoom', roomToJoin => {
+            // To avoid duplicity
+            nsSocket.rooms.forEach(roomToLeave => {
+                nsSocket.leave(roomToLeave);
+                updateUsersInRoom(namespace, roomToLeave, nsSocket);
+            });
+
             nsSocket.join(roomToJoin);
 
-            // Return the number of clients in a room
-            const clientsInRoom = nsSocket.adapter.rooms.get(roomToJoin).size
-            io.of(namespace.endpoint).in(roomToJoin).emit('updateRoomMemberCount', clientsInRoom);
-            
+            // Return the number of clients of the room that was joined
+            updateUsersInRoom(namespace, roomToJoin, nsSocket);
+
             // Get history
             const nsRoom = namespace.rooms.find(({roomTitle}) => roomTitle === roomToJoin.trim());
             nsSocket.emit('historyCatchUp', (nsRoom ? nsRoom.history : []));
@@ -50,3 +55,12 @@ namespaces.forEach(namespace => {
         });
     });
 })
+
+function updateUsersInRoom(namespace, room, nsSocket) {
+    const roomData = nsSocket.adapter.rooms.get(room);
+
+    if (roomData) {
+        const clientsInRoom = roomData.size
+        io.of(namespace.endpoint).in(room).emit('updateRoomMemberCount', clientsInRoom);
+    }
+}
