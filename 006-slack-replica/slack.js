@@ -35,8 +35,10 @@ namespaces.forEach(namespace => {
             console.log(`${nsSocket.id} joined room ${roomToJoin}`);
         });
 
-        nsSocket.on('newMessageToServer', msg => {
-            console.log(msg);
+        nsSocket.on('newMessageToServer', ({message, room}) => {
+            console.log(`Received message to room ${room} with content ${message.text}`);
+            // Forward the message to ALL Sockets that are in the room THIS socket is in
+            nsSocket.to(room).emit('messageToClients', message);            
         });
     })
 })

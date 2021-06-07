@@ -1,3 +1,5 @@
+let currentRoom;
+
 function updateRoomsGroup(rooms) {
     const gpRef     = document.querySelector('.room-list');
     gpRef.innerHTML = '';
@@ -35,4 +37,9 @@ function joinRoom(roomName) {
         // Update room members total
         document.querySelector('.curr-room-num-users').innerHTML = `${newNumberOfMembers} <span class="glyphicon glyphicon-user"></span>`;
     });
+
+    currentRoom = roomName;
+
+    // Handling messages received
+    nsSocket.on('messageToClients', addMessage);
 }
