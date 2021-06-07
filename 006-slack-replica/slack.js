@@ -18,7 +18,25 @@ io.on('connection', socket => {
 
 // Loop through each namespace and listen for a connection
 namespaces.forEach(namespace => {
-    io.of(namespace.endpoint).on('connection', socket => {
-        console.log(`${socket.id} has joined ${namespace.endpoint}`);
+    io.of(namespace.endpoint).on('connection', nsSocket => {
+        console.log(`${nsSocket.id} has joined the namespace ${namespace.endpoint}`);
+
+        // Sending back the particular namespace information back to the socket
+        nsSocket.emit('nsRoomList', namespace.rooms);
+
+        // Listening from a joining room request from the client
+        nsSocket.on('joinRoom', (roomToJoin, numberOfUsersCallback) => {
+            nsSocket.join(roomToJoin);
+
+            // Return the number of clients in a room
+            const clientsInRoom = nsSocket.adapter.rooms.get(roomToJoin).size
+            numberOfUsersCallback(clientsInRoom);
+            
+            console.log(`${nsSocket.id} joined room ${roomToJoin}`);
+        });
+
+        nsSocket.on('newMessageToServer', msg => {
+            console.log(msg);
+        });
     })
 })
