@@ -25,20 +25,28 @@ namespaces.forEach(namespace => {
         nsSocket.emit('nsRoomList', namespace.rooms);
 
         // Listening from a joining room request from the client
-        nsSocket.on('joinRoom', (roomToJoin, numberOfUsersCallback) => {
+        nsSocket.on('joinRoom', roomToJoin => {
             nsSocket.join(roomToJoin);
 
             // Return the number of clients in a room
             const clientsInRoom = nsSocket.adapter.rooms.get(roomToJoin).size
-            numberOfUsersCallback(clientsInRoom);
+            io.of(namespace.endpoint).in(roomToJoin).emit('updateRoomMemberCount', clientsInRoom);
             
+            // Get history
+            const nsRoom = namespace.rooms.find(({roomTitle}) => roomTitle === roomToJoin.trim());
+            nsSocket.emit('historyCatchUp', (nsRoom ? nsRoom.history : []));
+
             console.log(`${nsSocket.id} joined room ${roomToJoin}`);
         });
 
         nsSocket.on('newMessageToServer', ({message, room}) => {
             console.log(`Received message to room ${room} with content ${message.text}`);
+            // Get Room
+            const nsRoom = namespace.rooms.find(({roomTitle}) => roomTitle === room.trim());
+            nsRoom.addMessage(message);
+
             // Forward the message to ALL Sockets that are in the room THIS socket is in
-            nsSocket.to(room).emit('messageToClients', message);            
+            io.of(namespace.endpoint).to(room).emit('messageToClients', message);    
         });
-    })
+    });
 })

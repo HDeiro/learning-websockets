@@ -1,5 +1,5 @@
 function addMessage(msg) {
-    document.querySelector('#messages').innerHTML += `
+    $('#messages').innerHTML += `
         <li class="message-item">
             <div class="user-image">
                 <img src="${msg.avatar}" />
@@ -12,11 +12,15 @@ function addMessage(msg) {
     `;
 }
 
+function clearMessages() {
+    $('#messages').innerHTML = ``;
+}
+
 // Handling message sending
-document.querySelector('.message-form').addEventListener('submit', evt => {
+function onMessageSubmit(evt) {
     evt.preventDefault();
 
-    const input = document.querySelector('#user-message');
+    const input = $('#user-message');
 
     const message = {
         text: input.value,
@@ -25,6 +29,7 @@ document.querySelector('.message-form').addEventListener('submit', evt => {
         avatar: 'https://via.placeholder.com/30'
     };
 
-    addMessage(message);
+    input.value = '';
+
     nsSocket.emit('newMessageToServer', {message, room: currentRoom});
-});
+}

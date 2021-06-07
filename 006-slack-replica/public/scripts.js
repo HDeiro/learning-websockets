@@ -1,3 +1,6 @@
+const $  = document.querySelector.bind(document);
+const $$ = document.querySelectorAll.bind(document);
+
 const root    = 'http://localhost:8000';
 const socket1 = io(`${root}`);
 

@@ -1,7 +1,8 @@
 let nsSocket;
+let currentNamespace;
 
 function updateNamespacesGroup(namespaces) {
-    const nsRef     = document.querySelector('.namespaces');
+    const nsRef     = $('.namespaces');
     nsRef.innerHTML = '';
 
     // Add namespaces to DOM
@@ -13,25 +14,35 @@ function updateNamespacesGroup(namespaces) {
         `;
     });
 
-    document.querySelectorAll('.namespace').forEach(element => 
-        element.addEventListener('click', () => {
-            const ns = element.getAttribute('ns');
-            console.log(`The endpoint to redirect is ${ns}`);
-            joinNamespace(ns);
-        })
-    );
+    $$('.namespace').forEach(element => element.addEventListener('click', () => {
+        const ns = element.getAttribute('ns');
+        console.log(`The endpoint to redirect is ${ns}`);
+        joinNamespace(ns);
+    }));
 
     joinDefaultNamespace();
 }
 
 function joinDefaultNamespace() {
-    const defaultNamespace         = document.querySelector('.namespace');
+    const defaultNamespace         = $('.namespace');
     const defaultNamespaceEndpoint = defaultNamespace.getAttribute('ns');
     joinNamespace(defaultNamespaceEndpoint);
 }
 
 function joinNamespace(endpoint) {
+    if (nsSocket) {
+        nsSocket.close();
+        $('#user-input').removeEventListener('submit', onMessageSubmit, true);
+    }
+
+    currentNamespace = endpoint;
+
+    // Create a new Socket
     nsSocket = io(`${root}${endpoint}`);
     nsSocket.on('nsRoomList', updateRoomsGroup);
+
+    // Readd listener
+    $('#user-input').addEventListener('submit', onMessageSubmit, true);
+    
     console.log(`Joined the namespace ${endpoint}`);
 }

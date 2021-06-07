@@ -1,7 +1,7 @@
 let currentRoom;
 
 function updateRoomsGroup(rooms) {
-    const gpRef     = document.querySelector('.room-list');
+    const gpRef     = $('.room-list');
     gpRef.innerHTML = '';
 
     rooms.forEach(room => {
@@ -14,32 +14,46 @@ function updateRoomsGroup(rooms) {
     });
 
     // Add click listener for each room
-    document.querySelectorAll('.room').forEach(element => 
-        element.addEventListener('click', () => {
-            const roomName = element.innerText;
-            console.log(`Joining Room ${roomName}`);
-            joinRoom(roomName);
-        })
-    )
+    $$('.room').forEach(element => element.addEventListener('click', () => {
+        const roomName = element.innerText.trim();
+        joinRoom(roomName);
+    }))
     
     joinDefaultRoom();
 }
 
 function joinDefaultRoom() {
-    const defaultRoom     = document.querySelector('.room');
-    const defaultRoomName = defaultRoom.innerText;
+    const defaultRoom     = $('.room');
+    const defaultRoomName = defaultRoom.innerText.trim();
     joinRoom(defaultRoomName);
 }
 
 function joinRoom(roomName) {
+    if (roomName === currentRoom) {
+        console.log('Trying to rejoin the current room');
+        return;
+    }
+
     console.log(`Joined room ${roomName}`);
-    nsSocket.emit('joinRoom', roomName, newNumberOfMembers => {
-        // Update room members total
-        document.querySelector('.curr-room-num-users').innerHTML = `${newNumberOfMembers} <span class="glyphicon glyphicon-user"></span>`;
-    });
 
     currentRoom = roomName;
+    $('.curr-room-text').innerText = roomName;
+
+    // Turn off old possible listeners
+    nsSocket.off('messageToClients', addMessage);
+    
+    // Update room members total
+    nsSocket.emit('joinRoom', roomName);
 
     // Handling messages received
     nsSocket.on('messageToClients', addMessage);
+
+    // Handle room member count
+    nsSocket.on('updateRoomMemberCount', newNumberOfMembers => $('.current-users-count').innerHTML = `${newNumberOfMembers}`)
+
+    // Handling history catch up
+    nsSocket.on(`historyCatchUp`, history => {
+        clearMessages();
+        history.forEach(addMessage);
+    });
 }
