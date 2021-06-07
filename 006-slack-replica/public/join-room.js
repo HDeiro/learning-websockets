@@ -56,4 +56,15 @@ function joinRoom(roomName) {
         clearMessages();
         history.forEach(addMessage);
     });
+
+    // Handle searchbox
+    const searchbox = $('#search-box');
+    searchbox.addEventListener('input', () => {
+        const criterion = searchbox.value.toLowerCase();
+
+        [...$$('.message-text')].filter(element => {
+            element.parentElement.parentElement.classList.remove('hidden');
+            return element.innerText.toLowerCase().indexOf(criterion) < 0;
+        }).map(el => el.parentElement.parentElement).forEach(element => element.classList.add('hidden'));
+    })
 }

@@ -76,6 +76,10 @@ body{
     padding-left: 30px;
 }
 
+.hidden {
+    display: none !important;
+}
+
 .message-form { 
     margin: 0px; margin-bottom: 10px;
     position: absolute;
